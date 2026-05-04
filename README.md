@@ -1,5 +1,4 @@
-# E-Commerce Data Modeling and Revenue Integrity
-### SQL / PySpark
+# E-Commerce Data Modeling and Revenue Integrity - SQL / PySpark
 
 ## Problem Statement
 The goal of this project is to develop a robust analytics solution that transforms raw transactional data into actionable business intelligence. The solution addresses the following four key pillars:
