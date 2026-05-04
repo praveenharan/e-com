@@ -146,3 +146,25 @@ df_silver_products.write.format("delta") \
 
 display(df_silver_products)
 ```
+### Customers
+```sql
+
+# 1. Read the raw bronze customer SCD table
+# Note: Treated as a namespace/schema in your Fabric setup
+df_customers = spark.read.table("lh_Sales_Bronze.dbo.stg_customer_scd")
+
+# 2. Apply cleaning and SCD standardization
+df_silver_customers = df_customers \
+    .withColumn("name", upper(col("name"))) \
+    .withColumn("state", upper(col("state"))) \
+    .withColumn("eff_end", coalesce(col("eff_end"), lit("9999-12-31"))) \
+    .withColumn("is_current", when(col("eff_end") == "9999-12-31", "Yes").otherwise("No"))
+
+# 3. Write to Silver Lakehouse
+df_silver_customers.write.format("delta") \
+    .mode("overwrite") \
+    .option("overwriteSchema", "true") \
+    .saveAsTable("lh_Sales_Silver.dbo.customers_cleaned")
+
+display(df_silver_customers)
+```
