@@ -1,22 +1,19 @@
-# Student Analytics Notebook
+# Importing required library
 
-## Database Initialization
+### import random
 ```sql
-USE university_db;
+import random
 ```
+
 ### 1. Get the total number of students
 
-#### Using SQL
-```sql
-SELECT 
-    COUNT(*) AS total_students
-FROM
-    Students;
-```
-import random
+#### PySpark Core & Windowing
 
-# PySpark Core & Windowing
+```sql
 from pyspark.sql import SparkSession, Window
+```
+
+
 
 # PySpark Functions & Types (Aliased for clarity and namespace safety)
 import pyspark.sql.functions as F
