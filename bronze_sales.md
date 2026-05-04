@@ -25,7 +25,6 @@ for file_name, table_name in datasets:
     print(f"Processing {file_name}...")
     
     # 1. Read the raw CSV from the BRONZE Lakehouse explicitly
-    # Change 'sales' to 'landing_zone' to match your folder structure
     df = spark.read.format("csv") \
         .option("header", "true") \
         .option("inferSchema", "true") \
@@ -37,14 +36,14 @@ for file_name, table_name in datasets:
         .withColumn("source_system", lit("Landing_Zone_CSV")) \
         .withColumn("source_file", lit(file_name))
     
-    # 3. Write to the Silver Lakehouse as a Delta Table
+    # 3. Write to the Bronze Lakehouse as a Delta Table
     # This will create the table automatically if it doesn't exist
     df_with_metadata.write.format("delta") \
         .mode("overwrite") \
         .option("overwriteSchema", "true") \
         .saveAsTable(f"{table_name}")
 
-print("Success: All files moved to Silver Delta Tables.")
+print("Success: All files moved to Bronze Delta Tables.")
 ```
 
 
