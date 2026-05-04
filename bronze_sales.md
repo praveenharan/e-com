@@ -1,6 +1,5 @@
-# Importing required library
+### Importing required library
 
-### import random
 ```sql
 import random
 from pyspark.sql import SparkSession, Window
