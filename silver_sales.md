@@ -122,3 +122,27 @@ df_silver_items.write.format("delta") \
 
 display(df_silver_items)
 ```
+
+### Cleaning Products
+```sql
+# 1. Read the raw bronze products table
+df_products = spark.read.table("lh_Sales_Bronze.dbo.stg_products")
+
+# 2. Apply cleaning logic
+df_silver_products = df_products \
+    .dropDuplicates(["product_id"]) \
+    .withColumn("category", initcap(col("category"))) \
+    .withColumn("category", coalesce(col("category"), lit("Uncategorized"))) \
+    .withColumn("price", when(col("price") <= 0, lit(None))
+                        .when(col("price") > 5000, lit(None)) # Handling outliers
+                        .otherwise(col("price"))) \
+    .filter(col("price").isNotNull()) \
+    .filter(~col("sku").contains("B00")) # Filtering non-standard SKUs if required
+
+# 3. Write to Silver Lakehouse
+df_silver_products.write.format("delta") \
+    .mode("overwrite") \
+    .saveAsTable("lh_Sales_Silver.dbo.silver_products")
+
+display(df_silver_products)
+```
