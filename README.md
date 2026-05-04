@@ -25,7 +25,7 @@ The goal of this project is to develop a robust analytics solution that transfor
 ---
 
 ## Technical Stack
-* **Data Warehouse:** Microsoft Fabric / Snowflake / BigQuery
-* **Transformation Layer:** dbt (Data Build Tool) or Spark (PySpark)
-* **Orchestration:** Azure Data Factory / Airflow
-* **Visualization:** Power BI / Tableau
+* **Data Warehouse:** Microsoft Fabric (OneLake, Lakehouse, Data Warehouse)
+* **Transformation Layer:** Spark (PySpark via Fabric Notebooks) & SQL (T-SQL for Warehouse/Lakehouse Endpoint)
+* **Orchestration:** Data Factory (Fabric Pipelines)
+* **Visualization:** Power BI
