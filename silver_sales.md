@@ -58,3 +58,67 @@ customer_df.\
 
 display(customer_df)
 ```
+
+### Cleaning Events
+
+```sql
+# 1. Read your staging table
+df_events = spark.read.table("lh_Sales_Bronze.dbo.stg_events")
+
+# 2. Apply robust cleaning
+df_cleaned_events = df_events \
+    .dropDuplicates(["event_id"]) \
+    .withColumn("event_ts", try_to_timestamp(col("event_ts"))) \
+    .filter(col("payload").contains("{"))\
+    .dropna()
+
+# 3. Write to a new 'silver_events_cleaned' table
+df_cleaned_events.write.format("delta") \
+    .mode("overwrite") \
+    .option("overwriteSchema", "true") \
+    .saveAsTable("silver_events")
+
+# 4. Display
+display(df_cleaned_events)
+```
+### Cleaning Orders
+```sql
+# 1. Read the raw bronze table
+df_orders = spark.read.table("lh_Sales_Bronze.dbo.stg_orders")
+
+# 2. Apply Silver-level cleaning logic
+df_silver_orders = df_orders \
+    .dropDuplicates(["order_id"]) \
+    .withColumn("order_status", upper(col("order_status"))) \
+    .withColumn("order_ts", try_to_timestamp(col("order_ts"), lit("M/d/yy H:mm"))) \
+    .withColumn("order_total", when(col("order_total") < 0, abs(col("order_total"))).otherwise(col("order_total"))) \
+    .filter(col("order_ts").isNotNull()) 
+
+# 3. Write to Silver Lakehouse
+df_silver_orders.write.format("delta") \
+    .mode("overwrite") \
+    .saveAsTable("lh_Sales_Silver.dbo.silver_orders")
+
+display(df_silver_orders)
+```
+
+### Cleaning Items
+```python
+# 1. Read the raw bronze order items
+df_items = spark.read.table("lh_Sales_Bronze.dbo.stg_order_items")
+
+# 2. Apply cleaning and enrichment
+df_silver_items = df_items \
+    .dropDuplicates(["order_id", "line_num"]) \
+    .withColumn("qty", col("qty").cast("int")) \
+    .withColumn("unit_price", col("unit_price").cast("double")) \
+    .withColumn("line_total", round(col("qty") * col("unit_price"), 2)) \
+    .filter(col("qty") > 0) # Remove any zero-quantity rows if they exist
+
+# 3. Write to Silver Lakehouse
+df_silver_items.write.format("delta") \
+    .mode("overwrite") \
+    .saveAsTable("lh_Sales_Silver.dbo.silver_order_items")
+
+display(df_silver_items)
+```
