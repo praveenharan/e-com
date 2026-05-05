@@ -1,3 +1,4 @@
+### Moving to Warehouse to create Semantic Model
 ### Creating a Date Table
 
 ```sql
@@ -89,7 +90,7 @@ SELECT
 INTO fact_orders
 FROM lh_Sales_Silver.dbo.silver_orders
 ```
-
+### Moving customers to Warehouse
 ```sql
 SELECT
     customer_id,
