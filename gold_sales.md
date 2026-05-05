@@ -1,4 +1,4 @@
-### Creating a date table
+### Creating a Date Table
 
 ```sql
 -- 1. Creating the Date table structure 
