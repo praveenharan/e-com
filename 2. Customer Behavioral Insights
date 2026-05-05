@@ -1,0 +1,75 @@
+# Customer Behavioral Insights
+### SQL Logic (Window Functions)
+```sql
+WITH event_lags AS (
+    SELECT 
+        customer_id,
+        event_ts,
+        event_type,
+        LAG(event_ts) OVER (PARTITION BY customer_id ORDER BY event_ts) AS prev_event_ts
+    FROM dim_events
+),
+session_starts AS (
+    SELECT 
+        *,
+        CASE 
+            WHEN prev_event_ts IS NULL 
+                 OR TIMESTAMPDIFF(MINUTE, prev_event_ts, event_ts) > 30 THEN 1 
+            ELSE 0 
+        END AS is_new_session
+    FROM event_lags
+),
+session_ids AS (
+    SELECT 
+        *,
+        SUM(is_new_session) OVER (PARTITION BY customer_id ORDER BY event_ts) AS session_id
+    FROM session_starts
+)
+SELECT 
+    customer_id,
+    session_id,
+    MIN(event_ts) AS session_start,
+    MAX(event_ts) AS session_end,
+    TIMESTAMPDIFF(MINUTE, MIN(event_ts), MAX(event_ts)) AS duration_minutes,
+    STRING_AGG(event_type, ' -> ') WITHIN GROUP (ORDER BY event_ts) AS path_to_purchase
+FROM session_ids
+GROUP BY customer_id, session_id;
+```
+### PySpark Implementation
+
+```sql
+from pyspark.sql import functions as F
+from pyspark.sql.window import Window
+
+# 1. Define window and calculate time difference (in seconds)
+window_spec = Window.partitionBy("customer_id").orderBy("event_ts")
+events_df = spark.table("dim_events")
+
+events_with_lag = events_df.withColumn("prev_event_ts", F.lag("event_ts").over(window_spec))
+
+# 2. Identify new sessions (30 minute threshold = 1800 seconds)
+events_with_session_flag = events_with_lag.withColumn(
+    "new_session_flag",
+    F.when(
+        (F.col("prev_event_ts").isNull()) | 
+        (F.unix_timestamp("event_ts") - F.unix_timestamp("prev_event_ts") > 1800), 1
+    ).otherwise(0)
+)
+
+# 3. Create unique Session ID using a running sum
+events_with_session_id = events_with_session_flag.withColumn(
+    "session_id", 
+    F.sum("new_session_flag").over(window_spec)
+)
+
+# 4. Aggregate for Insights: Duration and Path
+behavioral_insights = events_with_session_id.groupBy("customer_id", "session_id") \
+    .agg(
+        F.min("event_ts").alias("session_start"),
+        F.max("event_ts").alias("session_end"),
+        ((F.unix_timestamp(F.max("event_ts")) - F.unix_timestamp(F.min("event_ts"))) / 60).alias("duration_min"),
+        F.collect_list("event_type").alias("path")
+    )
+
+behavioral_insights.show()
+```
