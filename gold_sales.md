@@ -57,18 +57,10 @@ SELECT
     o.order_status
 FROM dim_order_items oi
 JOIN dim_orders o ON oi.order_id = o.order_id;
-
-SELECT *
-from fact_sales
 ```
 
-### Creating dim_events
+### Moving dim_events to warehouse
 ```sql
-SELECT *
-FROM lh_Sales_Silver.dbo.silver_events
-
--- DROP TABLE dim_customers
-
 SELECT
     event_id,
     customer_id,
@@ -76,7 +68,24 @@ SELECT
     event_type
 INTO dim_events
 FROM lh_Sales_Silver.dbo.silver_events
+```
 
-SELECT *
-FROM dim_events
+### Moving SCD2 to Warehouse
+```sql
+SELECT 
+    customer_id,
+    name,
+    state,
+    eff_start,
+    eff_end,
+    is_current
+INTO dim_customers
+FROM lh_Sales_Silver.dbo.silver_scd2
+```
+ ### Moving order_items to Warehouse
+```sql
+SELECT
+    order_id, customer_id, order_ts, order_status, order_total
+INTO fact_orders
+FROM lh_Sales_Silver.dbo.silver_orders
 ```
