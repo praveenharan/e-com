@@ -1,4 +1,4 @@
-### Moving to Warehouse to create Semantic Model
+# Moving to Warehouse to create Semantic Model
 ### Creating a Date Table
 
 ```sql
