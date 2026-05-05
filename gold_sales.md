@@ -61,3 +61,22 @@ JOIN dim_orders o ON oi.order_id = o.order_id;
 SELECT *
 from fact_sales
 ```
+
+### Creating dim_events
+```sql
+SELECT *
+FROM lh_Sales_Silver.dbo.silver_events
+
+-- DROP TABLE dim_customers
+
+SELECT
+    event_id,
+    customer_id,
+    event_ts,
+    event_type
+INTO dim_events
+FROM lh_Sales_Silver.dbo.silver_events
+
+SELECT *
+FROM dim_events
+```
