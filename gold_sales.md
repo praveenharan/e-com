@@ -89,3 +89,13 @@ SELECT
 INTO fact_orders
 FROM lh_Sales_Silver.dbo.silver_orders
 ```
+
+```sql
+SELECT
+    customer_id,
+    name,
+    state,
+    is_current
+FROM dim_customers
+WHERE is_current = 'Yes'
+```
