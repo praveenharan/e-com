@@ -7,14 +7,14 @@ import pyspark.sql.functions as F
 import pyspark.sql.types as T
 from pyspark.sql.functions import col
 );
+```
+### Tables from Silver
 
--- Tables from Silver
 ```sql
 appointments = spark.read.table("Silver.silver_appointments")
 patients = spark.read.table("Silver.silver_patients")
 admissions = spark.read.table("Silver.silver_admission")
 providers = spark.read.table("Silver.silver_providers")
-# diagnosis = spark.read.table("Silver.silver_diagnosis")
 
 ```
 ### Creating Fact Sales Table
