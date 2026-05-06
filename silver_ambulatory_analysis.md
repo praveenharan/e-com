@@ -10,161 +10,75 @@ import pyspark.sql.types as T
 ```
 ### Cleaning stg_customers
 ```sql
-customer_df = spark.read.table("lh_Sales_Bronze.dbo.stg_customers")
+appointments_df = spark.read.table("stg_appointments")
 
-# 1. Standardize Casing and Trim whitespace
-# This handles 'ca' vs 'CA' and 'ny' vs 'NY'
-df_cleaned = customer_df.\
-    withColumn("name", trim(initcap(col("name")))).\
-    withColumn("state", upper(trim(col("state"))))
+appointments = appointments_df \
+    .filter(F.col("AppointmentID").isNotNull()) \
+    .withColumn("WaitTimeMinutes", F.col("WaitTimeMin")) \
+    .withColumn("IsNoShow", F.when(F.col("StatusKey") == "No-Show", 1).otherwise(0)) \
+    .withColumn("StandardizedStatus", F.upper(F.col("StatusKey"))) \
+    .dropDuplicates(["AppointmentID"])
 
-# 2. Fix State Inconsistencies (Mapping 'TEXAS' to 'TX')
-# You can expand this mapping as needed for your Medallion architecture
-state_map = {"TEXAS": "TX", "INVALIDSTATE": "UNKNOWN"}
-def map_states(state):
-    return state_map.get(state, state)
+# Note: Keeping audit columns (UpdatedTimestamp) here, and I will exclude them when moving to the Gold layer.
 
-# 3. Handle Nulls and Invalid Data
-# Providing a default for missing names and filtering invalid states
-df_cleaned = df_cleaned.\
-    fillna({"name": "Unknown Customer"}).\
-    filter(col("state") != "UNKNOWN")
-
-
-# 4. Handle Timestamps
-# Convert 'created_at' to a standard timestamp format for SCD logic
-df = df_cleaned \
-    .withColumn("created_at", to_timestamp(col("created_at"), "M/d/yy H:mm")) \
-    .withColumn("created_at", 
-        when(col("created_at").isNull(), 
-             to_timestamp(date_format(current_timestamp(), "yyyy-MM-dd HH:mm:ss"))
-        ).otherwise(col("created_at")))
-
-window_spec = Window.\
-    partitionBy("customer_id").\
-    orderBy(col("created_at").desc())
-
-customer_df = df.\
-    withColumn("rank", row_number().over(window_spec)).\
-    filter(col("rank") == 1).\
-    drop("rank")
-
-customer_df.\
-    write.\
-    mode("overwrite").\
-    option("overwriteScema", "true").\
-    format("delta").\
-    saveAsTable("silver_customers")
-
-display(customer_df)
+# Write to Silver Lakehouse
+appointments.write.format("delta").mode("overwrite").saveAsTable("Silver.silver_appointments")
 ```
 
-### Cleaning Events
+### Cleaning Locations
 
 ```sql
-# 1. Read your staging table
-df_events = spark.read.table("lh_Sales_Bronze.dbo.stg_events")
 
-# 2. Apply robust cleaning
-df_cleaned_events = df_events \
-    .dropDuplicates(["event_id"]) \
-    .withColumn("event_ts", try_to_timestamp(col("event_ts"))) \
-    .filter(col("payload").contains("{"))\
-    .dropna()
+location_df = spark.read.table('stg_location')
 
-# 3. Write to a new 'silver_events_cleaned' table
-df_cleaned_events.write.format("delta") \
-    .mode("overwrite") \
-    .option("overwriteSchema", "true") \
-    .saveAsTable("silver_events")
+location = location_df.select(
+    col("LocationKey").cast("string"),
+    trim(col("ClinicName")).alias("ClinicName"),
+    col("ZipCode").cast("string"), # Cast to string to keep leading zeros
+    col("load_timestamp"),
+    col("source_system"),
+    current_timestamp().alias("silver_load_at") # Track when it hit Silver
+).dropDuplicates(["LocationKey"])
 
-# 4. Display
-display(df_cleaned_events)
+# Write to Silver Lakehouse
+location.write.format("delta").mode("overwrite").saveAsTable("Silver.silver_locations")
 ```
-### Cleaning Orders
+### Cleaning Patients
 ```sql
-# 1. Read the raw bronze table
-df_orders = spark.read.table("lh_Sales_Bronze.dbo.stg_orders")
+# Transform and Clean
+silver_patients_df = patients.select(
+    col("PatientKey"),
+    col("Age"),
+    upper(col("Gender")).alias("Gender"), # Standardizing case
+    col("PrimaryInsurance"),
+    col("load_timestamp"),
+    col("source_system"),
+    col("source_file")
+).filter(col("Age") >= 0) \
+ .dropDuplicates(["PatientKey"])
 
-# 2. Apply Silver-level cleaning logic
-df_silver_orders = df_orders \
-    .dropDuplicates(["order_id"]) \
-    .withColumn("order_status", upper(col("order_status"))) \
-    .withColumn("order_ts", try_to_timestamp(col("order_ts"), lit("M/d/yy H:mm"))) \
-    .withColumn("order_total", when(col("order_total") < 0, abs(col("order_total"))).otherwise(col("order_total"))) \
-    .filter(col("order_ts").isNotNull()) 
-
-# 3. Write to Silver Lakehouse
-df_silver_orders.write.format("delta") \
+# Write to Silver Lakehouse as a Delta Table
+silver_patients_df.write.format("delta") \
     .mode("overwrite") \
-    .saveAsTable("lh_Sales_Silver.dbo.silver_orders")
-
-display(df_silver_orders)
+    .option("mergeSchema", "true") \
+    .saveAsTable("Silver.silver_patients")
 ```
 
-### Cleaning Items
+### Cleaning Providers
 ```python
-# 1. Read the raw bronze order items
-df_items = spark.read.table("lh_Sales_Bronze.dbo.stg_order_items")
+# Clean and refine Provider data
+silver_providers_df = providers.select(
+    col("ProviderKey"),
+    trim(regexp_replace(col("Name"), "Dr. ", "")).alias("ProviderName"), # Remove 'Dr.' prefix
+    col("Specialty"),
+    col("ExperienceYrs"),
+    col("load_timestamp"),
+    col("source_system"),
+    col("source_file")
+).dropDuplicates(["ProviderKey"])
 
-# 2. Apply cleaning and enrichment
-df_silver_items = df_items \
-    .dropDuplicates(["order_id", "line_num"]) \
-    .withColumn("qty", col("qty").cast("int")) \
-    .withColumn("unit_price", col("unit_price").cast("double")) \
-    .withColumn("line_total", round(col("qty") * col("unit_price"), 2)) \
-    .filter(col("qty") > 0) # Remove any zero-quantity rows if they exist
-
-# 3. Write to Silver Lakehouse
-df_silver_items.write.format("delta") \
+# Write to Silver Lakehouse
+silver_providers_df.write.format("delta") \
     .mode("overwrite") \
-    .saveAsTable("lh_Sales_Silver.dbo.silver_order_items")
-
-display(df_silver_items)
-```
-
-### Cleaning Products
-```sql
-# 1. Read the raw bronze products table
-df_products = spark.read.table("lh_Sales_Bronze.dbo.stg_products")
-
-# 2. Apply cleaning logic
-df_silver_products = df_products \
-    .dropDuplicates(["product_id"]) \
-    .withColumn("category", initcap(col("category"))) \
-    .withColumn("category", coalesce(col("category"), lit("Uncategorized"))) \
-    .withColumn("price", when(col("price") <= 0, lit(None))
-                        .when(col("price") > 5000, lit(None)) # Handling outliers
-                        .otherwise(col("price"))) \
-    .filter(col("price").isNotNull()) \
-    .filter(~col("sku").contains("B00")) # Filtering non-standard SKUs if required
-
-# 3. Write to Silver Lakehouse
-df_silver_products.write.format("delta") \
-    .mode("overwrite") \
-    .saveAsTable("lh_Sales_Silver.dbo.silver_products")
-
-display(df_silver_products)
-```
-### Customers
-```sql
-
-# 1. Read the raw bronze customer SCD table
-# Note: Treated as a namespace/schema in your Fabric setup
-df_customers = spark.read.table("lh_Sales_Bronze.dbo.stg_customer_scd")
-
-# 2. Apply cleaning and SCD standardization
-df_silver_customers = df_customers \
-    .withColumn("name", upper(col("name"))) \
-    .withColumn("state", upper(col("state"))) \
-    .withColumn("eff_end", coalesce(col("eff_end"), lit("9999-12-31"))) \
-    .withColumn("is_current", when(col("eff_end") == "9999-12-31", "Yes").otherwise("No"))
-
-# 3. Write to Silver Lakehouse
-df_silver_customers.write.format("delta") \
-    .mode("overwrite") \
-    .option("overwriteSchema", "true") \
-    .saveAsTable("lh_Sales_Silver.dbo.customers_cleaned")
-
-display(df_silver_customers)
+    .saveAsTable("Silver.silver_providers")
 ```
