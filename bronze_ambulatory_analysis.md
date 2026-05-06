@@ -7,17 +7,16 @@ import pyspark.sql.functions as F
 import pyspark.sql.types as T
 ```
 
-### Getting all the files from Bronze/Files
+### Getting all the required files from Bronze/Files
 
 ```sql
 # List of messy files and their intended table names
 datasets = [
-    ("customers.csv", "stg_customers"),
-    ("orders_raw.csv", "stg_orders"),
-    ("order_items_raw.csv", "stg_order_items"),
-    ("products_raw.csv", "stg_products"),
-    ("events_raw.csv", "stg_events"),
-    ("scd2_customer_dimensions.csv", "stg_customer_scd")
+    ("appointments.csv", "stg_appointments"),
+    ("location.csv", "stg_location"),
+    ("patients.csv", "stg_patients"),
+    ("providers.csv", "stg_providers")
+
 ]
 
 for file_name, table_name in datasets:
@@ -27,13 +26,13 @@ for file_name, table_name in datasets:
     df = spark.read.format("csv") \
         .option("header", "true") \
         .option("inferSchema", "true") \
-        .load(f"abfss://Sales_Data_Platform@onelake.dfs.fabric.microsoft.com/lh_Sales_Bronze.Lakehouse/Files/sales/{file_name}")
+        .load(f"abfss://Sales_Data_Platform@onelake.dfs.fabric.microsoft.com/Bronze.Lakehouse/Files/Ambulatory Analyst/{file_name}")
     
     # 2. Add Meta Data (Audit Columns)
     df_with_metadata = df \
-        .withColumn("load_timestamp", current_timestamp()) \
-        .withColumn("source_system", lit("Landing_Zone_CSV")) \
-        .withColumn("source_file", lit(file_name))
+        .withColumn("load_timestamp", F.current_timestamp()) \
+        .withColumn("source_system", F.lit("Landing_Zone_CSV")) \
+        .withColumn("source_file", F.lit(file_name))
     
     # 3. Write to the Bronze Lakehouse as a Delta Table
     # This will create the table automatically if it doesn't exist
@@ -41,6 +40,9 @@ for file_name, table_name in datasets:
         .mode("overwrite") \
         .option("overwriteSchema", "true") \
         .saveAsTable(f"{table_name}")
+
+print("Success: All files moved to Bronze Delta Tables.")
+```
 
 print("Success: All files moved to Bronze Delta Tables.")
 ```
