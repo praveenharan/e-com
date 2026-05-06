@@ -8,7 +8,7 @@ import pyspark.sql.functions as F
 import pyspark.sql.types as T
 
 ```
-### Cleaning stg_customers
+### Cleaning Appointments
 ```sql
 appointments_df = spark.read.table("stg_appointments")
 
