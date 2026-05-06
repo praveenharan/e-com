@@ -17,67 +17,73 @@ admissions = spark.read.table("Silver.silver_admission")
 providers = spark.read.table("Silver.silver_providers")
 
 ```
-### Creating Fact Sales Table
+### Transforming Silver to Gold
 ```sql
--- fact_sales table, JOIN between the orders and order_items
+# Transforming Silver to Gold
+fact_appointments_final = appointments.\
+    select(
+        col("AppointmentID"),
+        col("PatientKey"),
+        col("ProviderKey"),
+        col("LocationKey"),
+        col("DateKey"),
+        col("DurationMin"),
+        col("WaitTimeMin"),
+        col("WaitTimeMinutes"),
+        col("Charges"),
+        col("IsNoShow"),
+        col("StandardizedStatus").alias("Status")
+)
 
-CREATE TABLE fact_sales AS
-SELECT 
-    -- Keys for the Star Schema
-    oi.order_id,
-    oi.line_num,
-    o.customer_id,
-    oi.product_id,
-    
-    -- Date formatting for a Date Dimension (YYYYMMDD)
-    CAST(FORMAT(o.order_ts, 'yyyyMMdd') AS INT) AS order_date_key,
-    
-    -- Quantitative Measures
-    oi.qty,
-    oi.unit_price,
-    (oi.qty * oi.unit_price) AS line_total_amount,
-    o.order_status
-FROM dim_order_items oi
-JOIN dim_orders o ON oi.order_id = o.order_id;
-```
-
-### Moving dim_events to warehouse
-```sql
-SELECT
-    event_id,
-    customer_id,
-    event_ts,
-    event_type
-INTO dim_events
-FROM lh_Sales_Silver.dbo.silver_events
+# Write to the Gold Lakehouse
+# Fabric automatically applies V-Order when writing to Delta tables in a Notebook
+fact_appointments_final.\
+    write.\
+    format("delta").\
+    mode("overwrite").\
+    saveAsTable("gold_lh.dbo.fact_appointments")
 ```
 
-### Moving SCD2 to Warehouse
+### Moving dim_patients to gold
 ```sql
-SELECT 
-    customer_id,
-    name,
-    state,
-    eff_start,
-    eff_end,
-    is_current
-INTO dim_customers
-FROM lh_Sales_Silver.dbo.silver_scd2
+patients_final = patients.\
+    select("PatientKey",
+    "Age",
+    "Gender",
+    "PrimaryInsurance")
+
+patients_final.\
+    write.\
+    format("delta").\
+    mode("overwrite").\
+    saveAsTable("gold_lh.dbo.dim_patients")
 ```
- ### Moving order_items to Warehouse
+
+ ### Moving admissions to Warehouse
 ```sql
-SELECT
-    order_id, customer_id, order_ts, order_status, order_total
-INTO fact_orders
-FROM lh_Sales_Silver.dbo.silver_orders
+admissions_final = admissions.\
+    select(
+        "AdmissionID",
+        "PatientID",
+        "PhysicianID",
+        "AdmissionDate",
+        "DateKey",
+        "DiagnosisCode",
+        "LengthOfStay"
+    )
+
+admissions_final.\
+    write.\
+    mode("overwrite").\
+    format("delta").\
+    saveAsTable("gold_lh.dbo.dim_admissions")
 ```
-### Moving customers to Warehouse
 ```sql
-SELECT
-    customer_id,
-    name,
-    state,
-    is_current
-FROM dim_customers
-WHERE is_current = 'Yes'
+providers_final = providers.select("ProviderKey", "ProviderName", "Specialty", "ExperienceYrs")
+
+providers_final.\
+    write.\
+    mode("overwrite").\
+    format("delta").\
+    saveAsTable("gold_lh.dbo.dim_providers")
 ```
