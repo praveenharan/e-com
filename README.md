@@ -1,9 +1,7 @@
 # Ambulatory Performance & Clinical Insights Dashboard - SQL / PySpark / Fabric
 
 ## Problem Statement
-> Ambulatory leadership currently lacks a unified view of clinical and operational metrics, leading to delayed decision-making and difficulties in identifying performance gaps across multi-disciplinary workgroups. This project aims to bridge the gap between complex raw data sources (medical records, financial, and telecom) and actionable insights by developing a validated, end-to-end data pipeline and visualization suite. The goal is to ensure data integrity and provide clinic leaders with the clarity needed to optimize patient care and operational efficiency.
-
-> The clinic is experiencing unpredictable patient flow, leading to extended wait times during peak hours and underutilized staff during off-peak periods. Without visibility into appointment duration and wait time trends by provider specialty, the clinic cannot optimize scheduling, resulting in decreased patient satisfaction and staff burnout.
+> Ambulatory leadership lacks a unified view of clinical metrics, causing unpredictable patient flow and inefficient scheduling that leads to staff burnout. This project develops an end-to-end data pipeline and visualization suite to provide the clarity needed to optimize patient care and operational efficiency.
 
 
 ### 1. Clinical Performance and Trend Analysis
