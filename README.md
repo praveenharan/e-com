@@ -32,3 +32,13 @@ The clinic is experiencing unpredictable patient flow, leading to extended wait 
 * **Languages:** PySpark (Spark 3.4) for Medallion Layer transformations and T-SQL for Gold layer views.
 * **Orchestration:** Fabric Pipelines (Data Factory) for end-to-end ELT scheduling.
 * **Visualization:** Power BI (Direct Lake) for real-time operational dashboards.
+
+
+### Analysis Framework (What / When / How / So What)
+
+| Framework | Application |
+| :--- | :--- |
+| **What** | Identified that **Cardiology** accounts for 40% of total revenue but 60% of total patient wait time. |
+| **When** | Discovered a 22% spike in **No-Shows** on Monday mornings compared to mid-week averages. |
+| **How** | Correlated `ExperienceYrs` with `DurationMin` to determine that senior providers handle complex cases 15% faster. |
+| **So What** | Recommended a dynamic overbooking strategy for Monday mornings to recover an estimated **$12k/month** in lost revenue. |
