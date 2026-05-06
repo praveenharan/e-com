@@ -1,12 +1,14 @@
-# E-Commerce Data Modeling and Revenue Integrity - SQL / PySpark
+# Healthcare Analytics & Operational Excellence - SQL / PySpark / Fabric
 
 ## Problem Statement
-The goal of this project is to develop a robust analytics solution that transforms raw transactional data into actionable business intelligence. The solution addresses the following four key pillars:
+The clinic is experiencing unpredictable patient flow, leading to extended wait times during peak hours and underutilized staff during off-peak periods. Without visibility into appointment duration and wait time trends by provider specialty, the clinic cannot optimize scheduling, resulting in decreased patient satisfaction and staff burnout.
 
-### 1. Sales Performance and Trend Analysis
-* **Objective:** Quantify revenue across geographic regions and product categories.
-* **KPIs:** Track time-bound metrics including the last 7 days of revenue and daily order counts.
-* **Impact:** Enables stakeholders to identify high-growth regions and inventory demands in real-time.
+
+### 1. Clinical Performance and Trend Analysis
+* **Objective:** Quantify healthcare delivery across various medical specialties and clinic locations.
+* **KPIs:** Track operational metrics including No-Show Rates, Average Wait Times, and Total Patient Charges over rolling 30-day periods.
+* **Impact:** Enables administrators to identify bottlenecks in specific departments (e.g., Cardiology vs. Pediatrics) and adjust staffing levels in real-time.
+
 
 ### 2. Customer Behavioral Insights
 * **Objective:** Identify unique active customers and implement sessionization logic.
