@@ -1,4 +1,4 @@
-# Healthcare Analytics & Operational Excellence - SQL / PySpark / Fabric
+# Ambulatory Performance & Clinical Insights Dashboard - SQL / PySpark / Fabric
 
 ## Problem Statement
 > Ambulatory leadership currently lacks a unified view of clinical and operational metrics, leading to delayed decision-making and difficulties in identifying performance gaps across multi-disciplinary workgroups. This project aims to bridge the gap between complex raw data sources (medical records, financial, and telecom) and actionable insights by developing a validated, end-to-end data pipeline and visualization suite. The goal is to ensure data integrity and provide clinic leaders with the clarity needed to optimize patient care and operational efficiency.
