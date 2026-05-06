@@ -1,0 +1,6 @@
+﻿PatientKey,Age,Gender,Primary Insurance
+P001,28,Female,BlueCross
+P002,45,Male,Aetna
+P003,62,Female,Medicare
+P004,34,Non-Binary,UnitedHealth
+P005,12,Male,Cigna
