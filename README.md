@@ -10,24 +10,25 @@ The clinic is experiencing unpredictable patient flow, leading to extended wait 
 * **Impact:** Enables administrators to identify bottlenecks in specific departments (e.g., Cardiology vs. Pediatrics) and adjust staffing levels in real-time.
 
 
-### 2. Customer Behavioral Insights
-* **Objective:** Identify unique active customers and implement sessionization logic.
-* **Engagement:** Analyze user engagement patterns to understand the "path to purchase" and session duration.
-* **Impact:** Provides a foundation for targeted marketing and improved user experience.
+### 2. Patient Behavioral & Admission Insights
+* **Objective:** Analyze patient journey patterns using dim_patients and dim_admissions.
+* **Engagement:** Implement logic to track Length of Stay (LOS) and readmission patterns by diagnosis code.
+* **Impact:** Provides a foundation for proactive patient care and identifying "high-frequency" individuals who may benefit from specialized care management.
 
-### 3. Data Integrity and Accuracy
-* **Objective:** Perform rigorous audit checks on financial data.
-* **Logic:** Ensure that the reported `order_total` aligns with granular line-item calculations.
-* **Thresholds:** Implement automated flags for discrepancies that exceed defined variance thresholds.
+### 3. Data Integrity and Revenue Assurance
+* **Objective:** Perform rigorous audit checks on billing data within the Silver and Gold layers.
+* **Logic:** Validate that Total Charges in the FactAppointments table align with insurance provider fee schedules and duration-based billing logic.
+* **Medallion Strategy:** Specifically excluded technical metadata cleaning flags and silver table audit columns from the final Gold reporting layer to ensure a clean, business-ready schema.
 
 ### 4. Advanced Data Orchestration
-* **SCD Type 2:** Manage complex data states by implementing **Slowly Changing Dimensions** to maintain a full history of customer attribute changes.
-* **Localization:** Handle time-zone-specific reporting requirements to ensure daily metrics are accurate to the local region of operation.
-
+* **Star Schema Implementation:**  Developed a robust dimensional model, featuring one-to-many relationships between Patients, Providers, and Admissions.
+* **SCD Type 2:** Implemented Slowly Changing Dimensions for dim_providers to track changes in specialty or seniority over time, ensuring historical appointment data remains contextually accurate.
+* **Direct Lake Mode:** Leveraged Microsoft Fabric’s Direct Lake technology to provide Power BI with sub-second performance by reading Delta tables directly from OneLake without the need for import or Refresh.
 ---
 
 ## Technical Stack
-* **Data Warehouse:** Microsoft Fabric (OneLake, Lakehouse, Data Warehouse)
+* **Data Warehouse:** Microsoft Fabric (OneLake, Lakehouse, Data Warehouse, SQL Analytics Endpoint)
 * **Transformation Layer:** Spark (PySpark via Fabric Notebooks) & SQL (T-SQL for Warehouse/Lakehouse Endpoint)
-* **Orchestration:** Data Factory (Fabric Pipelines)
-* **Visualization:** Power BI
+* **Languages:** PySpark (Spark 3.4) for Medallion Layer transformations and T-SQL for Gold layer views.
+* **Orchestration:** Fabric Pipelines (Data Factory) for end-to-end ELT scheduling.
+* **Visualization:** Power BI (Direct Lake) for real-time operational dashboards.
