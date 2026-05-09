@@ -6,7 +6,8 @@ FROM gold_lh_for_ambulatory_analyst.dbo.dim_date AS A
 JOIN gold_lh_for_ambulatory_analyst.dbo.fact_encounters  AS B
 ON A.FullDate = B.EncounterDate
 GROUP BY A.day_of_week;
-
+```
+```sql
 -- Revenue by Specialty
 -- Identify which departments are the highest revenue drivers.
 SELECT A.Specialty, B.GrossCharge
@@ -14,6 +15,8 @@ FROM gold_lh_for_ambulatory_analyst.dbo.dim_providers AS A
 JOIN gold_lh_for_ambulatory_analyst.dbo.fact_encounters AS B
 ON A.ProviderID = B.ProviderID
 GROUP by A.Specialty, B.GrossCharge
+```
+```sql
 
 -- Geographic Leakage
 -- See if patients are traveling far, suggesting a need for a new clinic location.
@@ -33,6 +36,8 @@ JOIN gold_lh_for_ambulatory_analyst.dbo.fact_encounters f
 JOIN gold_lh_for_ambulatory_analyst.dbo.dim_locations l 
     ON f.LocationID = l.LocationKey
 WHERE p.ZipCode <> l.ZipCode;
+```
+```sql
 
 -- Wait Time Outliers
 -- Identify specific clinics or days where patient experience failed.
@@ -53,6 +58,4 @@ JOIN gold_lh_for_ambulatory_analyst.dbo.dim_locations l
     ON f.LocationID = l.LocationKey
 WHERE f.WaitTimeMin > (g.AvgWaitTime * 2)
 ORDER BY f.WaitTimeMin DESC;
-
-
 ```
