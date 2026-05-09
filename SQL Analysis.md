@@ -1,4 +1,6 @@
-# Busiest day of Week
+Running these queries in Fabric SQL Endpoint to find trends before building visuals.
+
+### Busiest day of Week
 ```sql
 -- Staffing optimization for busy mornings or Mondays.
 SELECT a A.day_of_week
@@ -8,7 +10,7 @@ ON A.FullDate = B.EncounterDate
 GROUP BY A.day_of_week;
 ```
 
-# Revenue by Specialty
+### Revenue by Specialty
 ```sql
 -- Identify which departments are the highest revenue drivers.
 SELECT A.Specialty, B.GrossCharge
@@ -17,7 +19,7 @@ JOIN gold_lh_for_ambulatory_analyst.dbo.fact_encounters AS B
 ON A.ProviderID = B.ProviderID
 GROUP by A.Specialty, B.GrossCharge
 ```
-# Geographic Leakage
+### Geographic Leakage
 ```sql
 -- See if patients are traveling far, suggesting a need for a new clinic location.
 SELECT 
@@ -37,7 +39,7 @@ JOIN gold_lh_for_ambulatory_analyst.dbo.dim_locations l
     ON f.LocationID = l.LocationKey
 WHERE p.ZipCode <> l.ZipCode;
 ```
-# Wait Time Outliers
+### Wait Time Outliers
 ```sql
 -- Identify specific clinics or days where patient experience failed.
 WITH GlobalMetrics AS (
