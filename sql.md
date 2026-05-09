@@ -37,9 +37,8 @@ JOIN gold_lh_for_ambulatory_analyst.dbo.dim_locations l
     ON f.LocationID = l.LocationKey
 WHERE p.ZipCode <> l.ZipCode;
 ```
+# Wait Time Outliers
 ```sql
-
--- Wait Time Outliers
 -- Identify specific clinics or days where patient experience failed.
 WITH GlobalMetrics AS (
     SELECT AVG(WaitTimeMin) AS AvgWaitTime
