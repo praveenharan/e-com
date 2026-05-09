@@ -1,4 +1,4 @@
-Running these queries in Fabric SQL Endpoint to find trends before building visuals.
+# Running these queries in Fabric SQL Endpoint to find trends
 
 ### Busiest day of Week
 ```sql
