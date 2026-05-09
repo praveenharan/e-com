@@ -1,8 +1,7 @@
 # Key Performance Indicators (KPIs)
 
+### These are the high-level "tiles" for the top of dashboard.
 ```
-These are the high-level "tiles" for the top of your dashboard.
-
 Total Encounters: Total volume of patient visits (Actuals vs. Target).
 
 No-Show Rate: (Total No Shows / Total Encounters) * 100. A critical metric for clinic efficiency.
