@@ -1,5 +1,5 @@
+# Busiest day of Week
 ```sql
--- Busiest day of Week
 -- Staffing optimization for busy mornings or Mondays.
 SELECT a A.day_of_week
 FROM gold_lh_for_ambulatory_analyst.dbo.dim_date AS A
@@ -7,8 +7,9 @@ JOIN gold_lh_for_ambulatory_analyst.dbo.fact_encounters  AS B
 ON A.FullDate = B.EncounterDate
 GROUP BY A.day_of_week;
 ```
+
+# Revenue by Specialty
 ```sql
--- Revenue by Specialty
 -- Identify which departments are the highest revenue drivers.
 SELECT A.Specialty, B.GrossCharge
 FROM gold_lh_for_ambulatory_analyst.dbo.dim_providers AS A
@@ -16,9 +17,8 @@ JOIN gold_lh_for_ambulatory_analyst.dbo.fact_encounters AS B
 ON A.ProviderID = B.ProviderID
 GROUP by A.Specialty, B.GrossCharge
 ```
+# Geographic Leakage
 ```sql
-
--- Geographic Leakage
 -- See if patients are traveling far, suggesting a need for a new clinic location.
 SELECT 
     p.PatientID,
