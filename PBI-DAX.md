@@ -74,16 +74,3 @@ CALCULATE(
     gold_fact_encounters[is_noshow] = 1
 )
 ```
-
-
-Total Encounters: Total volume of patient visits (Actuals vs. Target).
-
-
-
-
-Gross Charges: Total revenue generated before adjustments.
-
-Provider Productivity: Encounters / Unique Providers. Measures how busy your clinicians are.
-
-Patient Growth: New PatientID counts month-over-month.
-```
