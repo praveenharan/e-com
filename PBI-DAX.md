@@ -2,8 +2,13 @@
 
 ### These are the high-level "tiles" for the top of dashboard.
 ```
-Actual Encounters =
-  DISTINCTCOUNT(gold_fact_encounters[EncounterID])
+Actual Encounters = 
+    IF(
+        ISBLANK(
+            DISTINCTCOUNT(gold_fact_encounters[EncounterID])), 
+            0, 
+            DISTINCTCOUNT(gold_fact_encounters[EncounterID])
+    )
 ```
 
 ```
