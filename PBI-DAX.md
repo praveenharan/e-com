@@ -5,7 +5,8 @@
 Actual Encounters = 
     IF(
         ISBLANK(
-            DISTINCTCOUNT(gold_fact_encounters[EncounterID])), 
+            DISTINCTCOUNT(gold_fact_encounters[EncounterID])
+            ),
             0, 
             DISTINCTCOUNT(gold_fact_encounters[EncounterID])
     )
