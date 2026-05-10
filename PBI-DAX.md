@@ -11,6 +11,7 @@ Actual Encounters =
             DISTINCTCOUNT(gold_fact_encounters[EncounterID])
     )
 ```
+### Average Wait Time: AVG(WaitTimeMin). Used to identify patient experience bottlenecks.
 
 ```
 Average Wait Time = IF(
@@ -79,7 +80,6 @@ Total Encounters: Total volume of patient visits (Actuals vs. Target).
 
 
 
-Average Wait Time: AVG(WaitTimeMin). Used to identify patient experience bottlenecks.
 
 Gross Charges: Total revenue generated before adjustments.
 
