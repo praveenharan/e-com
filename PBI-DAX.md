@@ -62,14 +62,14 @@ No-Show Rate = IF(
 
 ```
 PatientGrowthMoM = 
-VAR current_month = [NewPatientsCount]
-VAR previous_month = 
-    CALCULATE(
-        [NewPatientsCount], 
-        DATEADD('gold_dim_date'[Date], -1, MONTH)
-    )
-RETURN
-    current_month - previous_month
+    VAR current_month = [NewPatientsCount]
+    VAR previous_month = 
+        CALCULATE(
+            [NewPatientsCount], 
+            DATEADD('gold_dim_date'[Date], -1, MONTH)
+        )
+    RETURN
+        current_month - previous_month
 
 ```
 ```
