@@ -13,8 +13,13 @@ Actual Encounters =
 ```
 
 ```
-Average Wait Time =
-  AVERAGE(gold_fact_encounters[WaitTimeMin])
+Average Wait Time = IF(
+    ISBLANK(
+        AVERAGE(gold_fact_encounters[WaitTimeMin])
+        ),
+        0,
+        AVERAGE(gold_fact_encounters[WaitTimeMin])
+)
 ```
 
 ```
@@ -40,9 +45,11 @@ CALCULATE(
 ```
 
 ```
+### No-Show Rate: (Total No Shows / Total Encounters) * 100. A critical metric for clinic efficiency.
 No-Show Rate = 
 DIVIDE(
-    [Total No-Shows], [Actual Encounters], 
+    [Total No-Shows],
+    [Actual Encounters], 
     0
 )
 ```
@@ -70,7 +77,7 @@ CALCULATE(
 
 Total Encounters: Total volume of patient visits (Actuals vs. Target).
 
-No-Show Rate: (Total No Shows / Total Encounters) * 100. A critical metric for clinic efficiency.
+
 
 Average Wait Time: AVG(WaitTimeMin). Used to identify patient experience bottlenecks.
 
