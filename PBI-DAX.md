@@ -46,12 +46,17 @@ CALCULATE(
 ```
 ### No-Show Rate: (Total No Shows / Total Encounters) * 100. A critical metric for clinic efficiency.
 ```
-
-No-Show Rate = 
-DIVIDE(
-    [Total No-Shows],
-    [Actual Encounters], 
-    0
+No-Show Rate = IF(
+    ISBLANK(
+        DIVIDE(
+            [Total No-Shows],
+            [Actual Encounters],
+            0)),
+        0,
+        DIVIDE(
+            [Total No-Shows],
+            [Actual Encounters],
+            0)
 )
 ```
 
