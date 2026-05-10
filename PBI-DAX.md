@@ -43,9 +43,9 @@ CALCULATE(
     KEEPFILTERS(gold_fact_encounters[DateKey] = MIN(gold_fact_encounters[DateKey]))
 )
 ```
-
-```
 ### No-Show Rate: (Total No Shows / Total Encounters) * 100. A critical metric for clinic efficiency.
+```
+
 No-Show Rate = 
 DIVIDE(
     [Total No-Shows],
