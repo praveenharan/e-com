@@ -1,6 +1,6 @@
 # Key Performance Indicators (KPIs)
 
-### These are the high-level "tiles" for the top of dashboard.
+## These are the high-level "tiles" for the top of dashboard.
 ```
 Actual Encounters = 
     IF(
