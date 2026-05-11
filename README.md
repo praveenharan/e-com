@@ -1,4 +1,4 @@
-# Ambulatory Performance & Clinical Insights Dashboard - SQL / PySpark / Fabric
+# Ambulatory Performance & Clinical Insights Dashboard - SQL / PySpark / Fabric (ETL)
 
 ## Problem Statement
 > Ambulatory leadership lacks a unified view of clinical metrics, causing unpredictable patient flow and inefficient scheduling that leads to staff burnout. This project develops an end-to-end data pipeline and visualization suite to provide the clarity needed to optimize patient care and operational efficiency.
