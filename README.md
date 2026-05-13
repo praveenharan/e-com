@@ -28,9 +28,9 @@
 
 ## Technical Stack
 * **Data Warehouse:** Microsoft Fabric (OneLake, Lakehouse, Data Warehouse, SQL Analytics Endpoint)
-* **Transformation Layer:** Spark (PySpark via Fabric Notebooks) & SQL (T-SQL for Warehouse/Lakehouse Endpoint)
+* **Transformation Layer:** Spark (PySpark via Fabric Notebooks/Databricks) & SQL (T-SQL for Warehouse/Lakehouse Endpoint)
 * **Languages:** PySpark (Spark 3.4) for Medallion Layer transformations and T-SQL for Gold layer views.
-* **Orchestration:** Fabric Pipelines (Data Factory) for end-to-end ELT scheduling.
+* **Orchestration:** Fabric Pipelines (Data Factory) for end-to-end ELT scheduling / Azure Data Factory
 * **Visualization:** Power BI (Direct Lake) for real-time operational dashboards.
 
 
